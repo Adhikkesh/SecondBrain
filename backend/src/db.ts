@@ -39,7 +39,7 @@ const tagsSchema = new schema({
 
 export const Tags = mongoose.model("Tags", tagsSchema);
 
-export const contentTypes = ["image", "video", "article", "audio"];
+export const contentTypes = ["document", "video", "tweet","audio"];
 
 const contentSchema = new schema({
   link: { type: String, trim: true, required: true },
