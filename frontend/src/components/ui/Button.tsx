@@ -11,8 +11,8 @@ interface ButtonProps {
 
 const Sizes: Record<Size, string> = {
   sm: "px-5 py-3",
-  md: "p-6 py-4",
-  lg: "p-7 py-5",
+  md: "px-6 py-4",
+  lg: "px-7 py-5",
 };
 
 const Variants: Record<VariantTypes, string> = {
