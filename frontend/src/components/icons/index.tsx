@@ -6,4 +6,5 @@ export const Size: Record<sizes,string> = {
 }
 export interface IconType{
     size?: sizes;
+    color?: string;
 }

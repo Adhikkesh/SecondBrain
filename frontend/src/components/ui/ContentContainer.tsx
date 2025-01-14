@@ -42,22 +42,37 @@ const iconLibrary: Record<TypesOfContents, ReactElement> = {
 export default function ContentContainer(props: ContentContainerType) {
   const { Content } = props;
   const { title, type, body, date } = Content;
-  const [toDate,setDate] = useState("");
+  const [toDate, setDate] = useState("");
   useEffect(() => {
     setDate(todayDate(date));
-  },[])
+  }, []);
   return (
-    <div className="max-w-80 border-2 p-4 flex flex-col gap-4 rounded-xl">
-      <div className="flex justify-between">
+    <div className=" border-2 p-4 flex flex-col gap-4 rounded-xl bg-white hover:shadow-sm transition-shadow">
+      <div className="flex justify-between items-start">
         {iconLibrary[type]}
-        <div className="text-xl font-bold tracking-tight "><a className="hover:underline hover:underline-offset-2" href={props.Content.link ? props.Content.link : undefined}>{title}</a></div>
-        {<ShareIcon />}
-        {<DeleteIcon />}
+        <div className="text-lg font-semibold line-clamp-2">
+          {Content.link ? (
+            <a
+              className="hover:underline hover:underline-offset-2"
+              href={props.Content.link ? props.Content.link : undefined}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {title}
+            </a>
+          ) : (
+            title
+          )}
+        </div>
+        <div className="flex gap-2">
+          {<ShareIcon />}
+          {<DeleteIcon />}
+        </div>
       </div>
-      <div>
+      <div className="flex-1">
         {type == "document" && body && <p className="text-gray-200">{body}</p>}
-        {type == "video" && <Youtube link={props.Content.link}/>}
-        {type == "tweet" && <Twitter link={props.Content.link}/>}
+        {type == "video" && <Youtube link={props.Content.link} />}
+        {type == "tweet" && <Twitter link={props.Content.link} />}
       </div>
       <div className="flex gap-4">
         {props.Content.tags
