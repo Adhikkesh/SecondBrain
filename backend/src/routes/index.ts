@@ -59,9 +59,10 @@ router.post("/signup", async (req: Request, res: Response) => {
       .status(Status.errorInInputs)
       .json({ error: "Error in Input", Zoderror: error });
   }
-
+  console.log("Signup entered");
   try {
     const response = await User.findOne({ username: data?.username });
+    console.log(response);
     if (response) {
       return res
         .status(Status.alreadyExist)
@@ -73,6 +74,7 @@ router.post("/signup", async (req: Request, res: Response) => {
       username: data?.username,
       password: hashedPassword,
     });
+    console.log("try end " + newUser);
     const token = jwt.sign({ id: newUser._id }, JWT_SECRET);
     return res
       .status(Status.signedUp)
@@ -130,11 +132,12 @@ router.post("/signin", async (req: Request, res: Response) => {
 });
 
 const contentZod = z.object({
-  link: z.string().trim(),
+  link: z.string().trim().optional(),
   type: z.string(),
   title: z.string(),
-  tags: z.array(z.string().trim().min(1)),
+  tags: z.array(z.string().trim().min(1)).optional(),
   userId: z.string(),
+  body: z.string().optional(),
 });
 
 router.post("/content", authMiddelware, async (req: Request, res: Response) => {
@@ -146,7 +149,7 @@ router.post("/content", authMiddelware, async (req: Request, res: Response) => {
   }
 
   console.log(data);
-
+  //@ts-ignore
   const tagPromises = data.tags.map(async (element) => {
     try {
       const existingTag = await Tags.findOne({ title: element });
@@ -160,12 +163,14 @@ router.post("/content", authMiddelware, async (req: Request, res: Response) => {
     const createdTags = await Promise.all(tagPromises);
     const tagArray = createdTags.map((tag) => tag._id);
 
-    const TagInput = {
+    let TagInput = {
       link: data?.link,
       type: data?.type,
       title: data?.title,
       tags: tagArray,
       userId: data?.userId,
+      date: new Date(),
+      ...(data.body ? { body: data.body } : {}),
     };
 
     const response = await Content.create(TagInput);
@@ -191,8 +196,24 @@ router.get("/content", authMiddelware, async (req: Request, res: Response) => {
   try {
     const userId = data.userId;
     const response = await Content.find({ userId: userId });
+    const contents = await Promise.all(
+      response.map(async (content) => {
+        const tagTitles = await Promise.all(
+          content.tags.map(async (tagId) => {
+            const tag = await Tags.findById(tagId, "title -_id");
+            return tag?.title;
+          })
+        );
+
+        return {
+          ...content.toObject(),
+          tags: tagTitles.filter(Boolean),
+          date: content.date?.toISOString(),
+        };
+      })
+    );
     return res.status(Status.success).json({
-      content: response,
+      content: contents,
     });
   } catch (err) {
     return res
@@ -259,12 +280,10 @@ router.post("/brain/share", authMiddelware, async (req, res) => {
         userId: userId,
       });
 
-      return res
-        .status(Status.success)
-        .json({
-          message: "Successfull",
-          link: `${BASE_URL}/api/v1/brain/share/${hash}`,
-        });
+      return res.status(Status.success).json({
+        message: "Successfull",
+        link: `${BASE_URL}/api/v1/brain/share/${hash}`,
+      });
     }
     return res.status(Status.errorInInputs).json({ error: "share is false" });
   } catch (err) {
@@ -276,8 +295,10 @@ router.post("/brain/share", authMiddelware, async (req, res) => {
 
 router.get("/brain/share/:hash", async (req, res) => {
   const { hash } = req.params;
-  if(!hash){
-    return res.status(Status.errorInInputs).json({error: "Link is not found"});
+  if (!hash) {
+    return res
+      .status(Status.errorInInputs)
+      .json({ error: "Link is not found" });
   }
   try {
     const response = await Link.findOne({ hash: hash }).populate(
@@ -298,8 +319,9 @@ router.get("/brain/share/:hash", async (req, res) => {
     );
     const promiseArray = resArr.map(async (e) => {
       return Promise.all(
-        e.tags.map(async (element) => {const obj = await Tags.findById(element, "-_id -__v");
-          return obj?.title
+        e.tags.map(async (element) => {
+          const obj = await Tags.findById(element, "-_id -__v");
+          return obj?.title;
         })
       );
     });

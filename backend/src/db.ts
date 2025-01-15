@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import "dotenv/config";
+import { string } from "zod";
 
 
 const ConnectToDatabase = async () => {
@@ -42,12 +43,13 @@ export const Tags = mongoose.model("Tags", tagsSchema);
 export const contentTypes = ["document", "video", "tweet","audio"];
 
 const contentSchema = new schema({
-  link: { type: String, trim: true, required: true },
-  type: { type: String, enum: contentTypes, trim: true },
-  title: { type: String, trim: true },
+  link: { type: String, trim: true},
+  type: { type: String, enum: contentTypes, trim: true ,required: true},
+  title: { type: String, trim: true,required: true},
   tags: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tags" }],
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  date: {type: Date}
+  body: {type: String, trim: true},
+  date: {type: Date , default: Date.now}
 });
 
 export const Content = mongoose.model("Content", contentSchema);

@@ -2,15 +2,13 @@ import ArticleIcon from "../icons/ArticleIcon";
 import AudioIcon from "../icons/AudioIcon";
 import TweetIcon from "../icons/TweetIcon";
 import VideoIcon from "../icons/VideoIcon";
+import Logo from "./Logo";
 import Comp from "./sidebarcomp";
 
 export default function SideBar() {
   return (
     <div className="hidden md:flex flex-col gap-8 w-60 lg:w-72 flex-shrink-0 ">
-      <div className="flex items-center gap-4">
-        {<img src="/images/brain.svg" />}
-        <p className="font-bold text-3xl tracking-tighter">Second Brain</p>
-      </div>
+      <Logo/>
       <div className="flex flex-col gap-8">
         <Comp
           icon={<TweetIcon size="lg" color="gray-300" />}

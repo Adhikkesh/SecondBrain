@@ -16,21 +16,29 @@ interface ContentType {
   title: string;
   tags?: string[];
   body?: string;
-  date: Date;
+  date: string | Date;
 }
 
 interface ContentContainerType {
   Content: ContentType;
 }
 
-function todayDate(date: Date): string {
-  let day = date.getDate();
-  let month = date.getMonth() + 1;
-  let m: string;
-  if (month < 9) m = "0" + month;
-  else m = "" + month;
-  let year = date.getFullYear();
-  return `${day}/${m}/${year}`;
+function todayDate(dateInput: Date | string): string {
+  try {
+    const date = new Date(dateInput);
+    if (isNaN(date.getTime())) {
+      return "Invalid Date";
+    }
+    
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const m = month < 10 ? `0${month}` : `${month}`;
+    const year = date.getFullYear();
+    return `${day}/${m}/${year}`;
+  } catch (error) {
+    console.error("Error parsing date:", error);
+    return "Invalid Date";
+  }
 }
 
 const iconLibrary: Record<TypesOfContents, ReactElement> = {
@@ -45,7 +53,7 @@ export default function ContentContainer(props: ContentContainerType) {
   const [toDate, setDate] = useState("");
   useEffect(() => {
     setDate(todayDate(date));
-  }, []);
+  }, [date]);
   return (
     <div className=" border-2 p-4 flex flex-col gap-4 rounded-xl bg-white hover:shadow-sm transition-shadow">
       <div className="flex justify-between items-start">

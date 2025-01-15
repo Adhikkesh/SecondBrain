@@ -6,7 +6,9 @@ interface ButtonProps {
   content: string;
   icon?: any;
   size?: Size;
-  onClick?: () => void;
+  onClick?:
+    | (() => void)
+    | ((event: React.MouseEvent<HTMLButtonElement>) => void);
 }
 
 const Sizes: Record<Size, string> = {
@@ -20,14 +22,24 @@ const Variants: Record<VariantTypes, string> = {
   secondary: "bg-purple-200 text-purple-300",
 };
 
-const defaultDesign = "rounded-lg flex items-center";
+const defaultDesign = "rounded-lg flex items-center justify-center size-max";
 export const Button = (props: ButtonProps) => {
   const { variant, content, size = "md" } = props;
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    if (props.onClick) {
+      props.onClick(event);
+    }
+  };
   return (
-    <button
-      className={`${Variants[variant]} ${defaultDesign} ${Sizes[size] || " "}`}
-    >
-      {props.icon ? <div className="mr-4">{props.icon}</div> : null} {content}
-    </button>
+    <div className="flex justify-center">
+      <button
+        className={`${Variants[variant]} ${defaultDesign} ${
+          Sizes[size] || " "
+        }`}
+        onClick={handleClick}
+      >
+        {props.icon ? <div className="mr-4">{props.icon}</div> : null} {content}
+      </button>
+    </div>
   );
 };
