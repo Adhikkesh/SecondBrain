@@ -1,34 +1,44 @@
 import { useState } from "react";
-import InputBox from "./inputBox";
-import { Button } from "./Button";
-import Logo from "./Logo";
+import InputBox from "../components/ui/inputBox";
+import { Button } from "../components/ui/Button";
+import Logo from "../components/ui/Logo";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-export default function SignIn() {
+export default function SignUp() {
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
-  const [error,setError] = useState("");
-  const [loading,setLoading] = useState(false);
+  const [confirmpassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+
   async function handleSubmit() {
+    setError("");
+    if (password !== confirmpassword) {
+      setError("confirm password mismatch");
+      console.log("confirm");
+      return;
+    }
+
     if (!username || !password) {
       setError("Username and password are required");
       return;
     }
-    
+
     setLoading(true);
     try {
-      const response = await axios.post("http://localhost:3000/api/v1/signin", {
+      console.log("Entered");
+      const response = await axios.post("http://localhost:3000/api/v1/signup", {
         username: username,
         password: password,
       });
-      localStorage.setItem("token",response.data.token);
+      localStorage.setItem("token", response.data.token);
       navigate("/dashboard");
     } catch (err: any) {
+      console.log("Catch");
       if (err.response) {
-        // Handle specific error cases based on status codes
         switch (err.response.status) {
           case 411:
             setError(
@@ -51,20 +61,19 @@ export default function SignIn() {
       } else {
         setError("An error occurred. Please try again");
       }
-    }finally {
+    } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="p-6 bg-cyan-400 min-h-screen relative">
+    <div className="p-6 min-h-screen">
       <div className="absolute top-4 left-4">
         <Logo />
       </div>
-
       <div className="flex justify-center items-center min-h-screen">
         <div className="flex flex-col gap-4 border-2 border-gray-100 rounded-lg p-8 w-full max-w-md mx-4">
-          <p className="flex justify-center text-2xl font-bold">SignIn</p>
+          <p className="flex justify-center text-2xl font-bold">SignUp</p>
           <InputBox
             placeholder="username"
             label="username"
@@ -80,10 +89,20 @@ export default function SignIn() {
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               setPassword(e.target.value);
             }}
+            password={true}
+          />
+          <InputBox
+            placeholder="Confirm Password"
+            label="confirm password"
+            value={confirmpassword}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setConfirmPassword(e.target.value);
+            }}
+            password={true}
           />
           <Button
             variant="primary"
-            content="Sign In"
+            content="Sign Up"
             size="md"
             onClick={handleSubmit}
           />

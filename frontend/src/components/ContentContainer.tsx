@@ -1,13 +1,13 @@
 import { ReactElement, useEffect, useState } from "react";
-import ArticleIcon from "../icons/ArticleIcon";
-import VideoIcon from "../icons/VideoIcon";
-import TweetIcon from "../icons/TweetIcon";
-import AudioIcon from "../icons/AudioIcon";
-import ShareIcon from "../icons/ShareIcon";
-import DeleteIcon from "../icons/DeleteIcon";
-import Tag from "./Tag";
-import Youtube from "./Youtube";
-import Twitter from "./Twitter";
+import ArticleIcon from "./icons/ArticleIcon";
+import VideoIcon from "./icons/VideoIcon";
+import TweetIcon from "./icons/TweetIcon";
+import AudioIcon from "./icons/AudioIcon";
+import ShareIcon from "./icons/ShareIcon";
+import DeleteIcon from "./icons/DeleteIcon";
+import Tag from "./ui/Tag";
+import Youtube from "./ui/Youtube";
+import Twitter from "./ui/Twitter";
 
 type TypesOfContents = "document" | "video" | "tweet" | "audio";
 interface ContentType {
@@ -21,6 +21,8 @@ interface ContentType {
 
 interface ContentContainerType {
   Content: ContentType;
+  handleDelete: (id: string) => void;
+  id: string;
 }
 
 function todayDate(dateInput: Date | string): string {
@@ -29,7 +31,7 @@ function todayDate(dateInput: Date | string): string {
     if (isNaN(date.getTime())) {
       return "Invalid Date";
     }
-    
+
     const day = date.getDate();
     const month = date.getMonth() + 1;
     const m = month < 10 ? `0${month}` : `${month}`;
@@ -54,6 +56,7 @@ export default function ContentContainer(props: ContentContainerType) {
   useEffect(() => {
     setDate(todayDate(date));
   }, [date]);
+
   return (
     <div className=" border-2 p-4 flex flex-col gap-4 rounded-xl bg-white hover:shadow-sm transition-shadow">
       <div className="flex justify-between items-start">
@@ -74,7 +77,15 @@ export default function ContentContainer(props: ContentContainerType) {
         </div>
         <div className="flex gap-2">
           {<ShareIcon />}
-          {<DeleteIcon />}
+          {
+            <button
+              onClick={() => {
+                props.handleDelete(props.id);
+              }}
+            >
+              <DeleteIcon />
+            </button>
+          }
         </div>
       </div>
       <div className="flex-1">
@@ -93,6 +104,3 @@ export default function ContentContainer(props: ContentContainerType) {
     </div>
   );
 }
-
-// link is optional
-// add date in database

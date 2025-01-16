@@ -1,46 +1,33 @@
 import { useState } from "react";
-import InputBox from "./inputBox";
-import { Button } from "./Button";
-import Logo from "./Logo";
+import InputBox from "../components/ui/inputBox";
+import { Button } from "../components/ui/Button";
+import Logo from "../components/ui/Logo";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-export default function SignUp() {
+export default function SignIn() {
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmpassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading,setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // const BASE_URL = import.meta.env.VITE_BASE_URL;
-
   async function handleSubmit() {
-    setError("");
-    if (password !== confirmpassword) {
-      setError("confirm password mismatch");
-      console.log("confirm");
-      return;
-    }
-
     if (!username || !password) {
       setError("Username and password are required");
       return;
     }
-    
+
     setLoading(true);
     try {
-      console.log("Entered");
-      const response = await axios.post("http://localhost:3000/api/v1/signup", {
+      const response = await axios.post("http://localhost:3000/api/v1/signin", {
         username: username,
         password: password,
       });
-      localStorage.setItem("token",response.data.token);
+      localStorage.setItem("token", response.data.token);
       navigate("/dashboard");
     } catch (err: any) {
-      console.log("Catch");
       if (err.response) {
-        // Handle specific error cases based on status codes
         switch (err.response.status) {
           case 411:
             setError(
@@ -63,19 +50,25 @@ export default function SignUp() {
       } else {
         setError("An error occurred. Please try again");
       }
-    }finally {
+    } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="p-6 min-h-screen">
+    <div className="p-6 bg-cyan-400 min-h-screen relative">
       <div className="absolute top-4 left-4">
         <Logo />
       </div>
+
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-700" />
+        </div>
+      ) : (
       <div className="flex justify-center items-center min-h-screen">
         <div className="flex flex-col gap-4 border-2 border-gray-100 rounded-lg p-8 w-full max-w-md mx-4">
-          <p className="flex justify-center text-2xl font-bold">SignUp</p>
+          <p className="flex justify-center text-2xl font-bold">SignIn</p>
           <InputBox
             placeholder="username"
             label="username"
@@ -91,24 +84,17 @@ export default function SignUp() {
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               setPassword(e.target.value);
             }}
-          />
-          <InputBox
-            placeholder="Confirm Password"
-            label="confirm password"
-            value={confirmpassword}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              setConfirmPassword(e.target.value);
-            }}
+            password={true}
           />
           <Button
             variant="primary"
-            content="Sign Up"
+            content="Sign In"
             size="md"
             onClick={handleSubmit}
           />
           {error && <p className="text-red-600 text-sm">{error}</p>}
         </div>
-      </div>
+      </div> )}
     </div>
   );
 }

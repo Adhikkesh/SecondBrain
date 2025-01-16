@@ -8,7 +8,7 @@ export default function crossIcon(props: IconType) {
       viewBox="0 0 24 24"
       stroke-width="1.5"
       stroke="currentColor"
-      className={`${props.size ? Size[props.size] : Size["md"]} ${props.color ? props.color : "text-gray-100"}`}
+      className={`${props.size ? Size[props.size] : Size["md"]} "text-gray-900"`}
     >
       <path
         stroke-linecap="round"

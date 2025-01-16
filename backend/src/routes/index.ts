@@ -170,8 +170,12 @@ router.post("/content", authMiddelware, async (req: Request, res: Response) => {
       tags: tagArray,
       userId: data?.userId,
       date: new Date(),
-      ...(data.body ? { body: data.body } : {}),
     };
+
+    if(data?.body){
+      //@ts-ignore
+      TagInput.body = data.body;
+    }
 
     const response = await Content.create(TagInput);
     return res.status(Status.success).json({ message: "Sucessfull" });
@@ -282,7 +286,7 @@ router.post("/brain/share", authMiddelware, async (req, res) => {
 
       return res.status(Status.success).json({
         message: "Successfull",
-        link: `${BASE_URL}/api/v1/brain/share/${hash}`,
+        link: `${hash}`,
       });
     }
     return res.status(Status.errorInInputs).json({ error: "share is false" });

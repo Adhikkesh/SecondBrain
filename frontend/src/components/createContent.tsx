@@ -1,11 +1,10 @@
 import { useState } from "react";
-import InputBox from "./inputBox";
-import { Button } from "./Button";
-import crossIcon from "../icons/crossIcon";
-import SelectBox from "./SelectBox";
-import TextArea from "./TextArea";
-import TagInput from "./TagInput";
-import Tag from "./Tag";
+import InputBox from "./ui/inputBox";
+import { Button } from "./ui/Button";
+import SelectBox from "./ui/SelectBox";
+import TextArea from "./ui/TextArea";
+import TagInput from "./ui/TagInput";
+import Tag from "./ui/Tag";
 import axios from "axios";
 
 interface CreateContentType {
@@ -70,20 +69,15 @@ export default function CreateContent(props: CreateContentType) {
           body: body,
         };
         if (link.trim()) {
-          obj = {
-            ...obj,
-            link: link,
-          };
+          //@ts-ignore
+          obj.link = link;
         }
         if (tags) {
-          obj = {
-            ...obj,
-            tags: tags,
-          };
+          //@ts-ignore
+          obj.tags = tags;
         }
       }
       console.log(obj);
-      console.log(value);
       const response = await axios.post(
         "http://localhost:3000/api/v1/content",
         obj,
@@ -102,11 +96,9 @@ export default function CreateContent(props: CreateContentType) {
         switch (err.response.status) {
           case 411:
             console.error("Invalid input:", err.response.data.error);
-            // Handle validation error
             break;
           case 401:
             console.error("Unauthorized - invalid or expired token");
-            // Maybe redirect to login
             break;
           default:
             console.error("Server error:", err.response.data.error);
@@ -118,18 +110,19 @@ export default function CreateContent(props: CreateContentType) {
       }
     }
   }
+
   return (
-    <div className="fixed inset-0 bg-opacity-50 flex w-full justify-center items-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex w-full justify-center items-center z-50">
       <div className="bg-white rounded-lg shadow-lg max-w-md w-full mx-4 p-6">
         <div className="flex justify-between items-center mb-6">
           <p className="text-3xl font-bold">Add Content</p>
-          <Button
-            icon={crossIcon}
-            onClick={props.onClose}
-            content="x close"
-            variant="secondary"
-            size="sm"
-          />
+          <button
+            onClick={() => {
+              props.onClose();
+            }}
+          >
+            <img src="/images/close.png" className="max-w-5" />
+          </button>
         </div>
         <div>
           <form className="flex flex-col gap-4">
